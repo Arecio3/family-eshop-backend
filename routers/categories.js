@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const { Category } = require('../models/category');
 
+router.get(`/`, async (req, res) => {
+    const categoryList = await Category.find();
 
-const categorySchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    color: String,
-    icon:  String,
-    image: String
+    if (!categoryList) {
+        res.status(500).json({success: false})
+    }
+    res.send(categoryList);
 })
 
-exports.Category = mongoose.model('Category', categorySchema);
+module.exports = router;

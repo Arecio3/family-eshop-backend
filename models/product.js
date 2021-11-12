@@ -19,10 +19,10 @@ const productSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    category: {
-        type: Category,
-        required: true
-    },
+    // category: {
+    //     type: Category,
+    //     required: true
+    // },
     rating: Number,
     isFeatured: Boolean,
     condition: { 
