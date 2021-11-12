@@ -9,11 +9,15 @@ const productsRouter = require('./routers/products');
 const ordersRouter = require('./routers/orders');
 const usersRouter = require('./routers/users');
 const categoriesRouter = require('./routers/categories');
-
+const cors = require('cors');
 // Enviroment Variables
 const api = process.env.API_URL;
 const dbConnect = process.env.DB_URL;
 
+// So we can make req from another origin
+app.use(cors());
+// Allows any origin to do http req
+app.options('*', cors());
 
 // ----- Middleware --- (function that has control of req, res of any API)
 // Parse JSON 
