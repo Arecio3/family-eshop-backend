@@ -5,7 +5,10 @@ const path = require('path');
 const morgan = require('morgan');
 require('dotenv/config');
 const mongoose = require('mongoose');
-const productRouter = require('./routers/products');
+const productsRouter = require('./routers/products');
+const ordersRouter = require('./routers/orders');
+const usersRouter = require('./routers/users');
+const categoriesRouter = require('./routers/categories');
 
 // Enviroment Variables
 const api = process.env.API_URL;
@@ -25,8 +28,11 @@ app.use(morgan('tiny'))
 // Morgan writes a file for API logs
 app.use(morgan('combined', { stream: accessLogStream }))
 
-// Hooks up the routes 
-app.use(`${api}/products`, productRouter)
+// Hooks up the Routers 
+app.use(`${api}/products`, productsRouter)
+app.use(`${api}/orders`, ordersRouter)
+app.use(`${api}/users`, usersRouter)
+app.use(`${api}/categories`, categoriesRouter)
 // ----- End of Middleware -----
 
 
