@@ -4,8 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const morgan = require('morgan');
 require('dotenv/config');
-const api = process.env.API_URL;
+const mongoose = require('mongoose');
 
+const api = process.env.API_URL;
+const dbConnect = process.env.DB_URL;
 // ----- Middleware --- (function that has control of req, res of any API)
 // Parse JSON 
 app.use(express.json())
@@ -34,6 +36,17 @@ app.post(`${api}/products`, (req, res) => {
     console.log(newProduct)
     // Sends to frontend
     res.send(newProduct);
+})
+
+// Connect DB
+mongoose.connect(dbConnect)
+// On Success
+.then(() => {
+    console.log('Database Connection Successful !')
+})
+// On Failure
+.catch((err) => {
+    console.log(err)
 })
 
 // Run server with msg on success
