@@ -9,7 +9,17 @@ router.get(`/`, async (req, res) => {
     if (!categoryList) {
         res.status(500).json({success: false})
     }
-    res.send(categoryList);
+    res.status(200).send(categoryList);
+})
+
+// One Category
+router.get('/:id', async (req, res) => {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+        res.status(500).json({message: 'The Categorys ID is invalid'})
+    }
+    res.status(200).send(category)
 })
 
 // Post Categories
