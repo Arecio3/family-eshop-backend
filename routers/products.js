@@ -2,6 +2,7 @@ const express = require("express");
 const { Category } = require("../models/category");
 const router = express.Router();
 const { Product } = require("../models/product");
+const mongoose = require('mongoose');
 
 // get all products route .select('name image -_id') populate is showing category details on JSON return
 router.get(`/`, async (req, res) => {
@@ -53,6 +54,10 @@ router.post(`/`, async (req, res) => {
 
 // Update Product
 router.put("/:id", async (req, res) => {
+    // Checks if the ID is wrong
+  if (!mongoose.isValidObjectId(req.params.id)) {
+      res.status(400).send('Invalid Product ID')
+  }
     // Check if category exist
   const category = await Category.findById(req.body.category);
   if (!category) return res.status(400).send("Invalid Category");
@@ -99,5 +104,17 @@ router.delete('/:id', (req, res) => {
         return res.status(400).json({success: false, error: err})
     })
 })
+
+// Grabs total of Products
+router.get(`/get/inventory`, async (req, res) => {
+    const productCount = await Product.countDocuments()
+    // If theres no products
+    if (!productCount) {
+      res.status(500).json({ success: false })
+    }
+    res.send({
+        productCount: productCount
+    });
+  });
 
 module.exports = router;
