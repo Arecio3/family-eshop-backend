@@ -20,6 +20,14 @@ app.use(morgan('tiny'))
 app.use(morgan('combined', { stream: accessLogStream }))
 // ----- End of Middleware -----
 
+const productSchema = mongoose.Schema({
+    name: String,
+    image: String,
+    countInStock: Number,
+})
+
+const Product = mongoose.model('Product', productSchema)
+
 // get product route = http://localhost:3000/api/v1/products
 app.get(`${api}/products`, (req, res) => {
     const product = {
@@ -31,11 +39,24 @@ app.get(`${api}/products`, (req, res) => {
 })
 // specify inital route = http://localhost:3000/api/v1/products
 app.post(`${api}/products`, (req, res) => {
-    // grabs data from DOM body
-    const newProduct = req.body;
-    console.log(newProduct)
-    // Sends to frontend
-    res.send(newProduct);
+    // Creating new product with request from body of DOM
+    const product = new Product({
+        name: req.body.name,
+        image: req.body.image,
+        countInStock: req.body.countInStock
+    })
+
+    // Save to DB
+    product.save().then((createdProduct => {
+        // returns status and json obj of product
+        res.status(201).json(createdProduct)
+    })).catch((err) => {
+        res.status(500).json({
+            // usecase for stopping proccess
+            error: err,
+            success: false
+        })
+    })
 })
 
 // Connect DB
