@@ -11,7 +11,6 @@ const usersRouter = require('./routers/users');
 const categoriesRouter = require('./routers/categories');
 const cors = require('cors');
 const authJwt = require('./helpers/jwt');
-const errorHandler = require('./helpers/error-handler');
 
 // Enviroment Variables
 const api = process.env.API_URL;
@@ -36,7 +35,21 @@ app.use(morgan('tiny'))
 app.use(authJwt())
 
 //API Error handling  
-app.use(errorHandler())
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        // jwt authentication error
+        return res.status(401).json({message: "The user is not authorized"})
+    }
+
+    if (err.name === 'ValidationError') {
+        //  validation error
+        return res.status(401).json({message: err})
+    }
+
+    // default to 500 server error
+    return res.status(500).json(err);
+
+})
 
 // Morgan writes a file for API logs
 app.use(morgan('combined', { stream: accessLogStream }))
