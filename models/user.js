@@ -33,6 +33,10 @@ const userSchema = mongoose.Schema({
         type: String,
         default: '',
     },
+    state: {
+        type: String,
+        default: '',
+    },
     phone: {
         type: String,
         required: true,
@@ -44,11 +48,11 @@ const userSchema = mongoose.Schema({
 })
 
 // Virtuals to change _id to id
-productSchema.virtual('id').get(function() {
+userSchema.virtual('id').get(function() {
     return this._id.toHexString();
 });
 // To be able to send values from front to back 
-productSchema.set('toJSON' , {
+userSchema.set('toJSON' , {
     virtuals: true,
 });
 

@@ -7,11 +7,11 @@ const orderItemSchema = mongoose.Schema({
 })
 
 // Virtuals to change _id to id
-productSchema.virtual('id').get(function() {
+orderItemSchema.virtual('id').get(function() {
     return this._id.toHexString();
 });
 // To be able to send values from front to back 
-productSchema.set('toJSON' , {
+orderItemSchema.set('toJSON' , {
     virtuals: true,
 });
 

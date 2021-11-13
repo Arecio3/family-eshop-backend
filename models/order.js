@@ -19,11 +19,11 @@ const orderSchema = mongoose.Schema({
 })
 
 // Virtuals to change _id to id
-productSchema.virtual('id').get(function() {
+orderSchema.virtual('id').get(function() {
     return this._id.toHexString();
 });
 // To be able to send values from front to back 
-productSchema.set('toJSON' , {
+orderSchema.set('toJSON' , {
     virtuals: true,
 });
 
