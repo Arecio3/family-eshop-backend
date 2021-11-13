@@ -74,3 +74,4 @@ productSchema.set('toJSON' , {
 });
 
 exports.Product = mongoose.model('Product', productSchema);
+exports.productSchema = productSchema;

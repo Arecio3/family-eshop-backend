@@ -13,13 +13,44 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    street: String,
-    apartment: String,
-    city: String,
-    zip: String,
-    country: String,
-    phone: String,
-    isAdmin: Boolean
+    street: {
+        type: String,
+        default: '',
+    },
+    apartment: {
+        type: String,
+        default: '',
+    },
+    city: {
+        type: String,
+        default: '',
+    },
+    zip: {
+        type: String,
+        default: '',
+    },
+    country: {
+        type: String,
+        default: '',
+    },
+    phone: {
+        type: String,
+        required: true,
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    }
 })
 
+// Virtuals to change _id to id
+productSchema.virtual('id').get(function() {
+    return this._id.toHexString();
+});
+// To be able to send values from front to back 
+productSchema.set('toJSON' , {
+    virtuals: true,
+});
+
 exports.User = mongoose.model('User', userSchema);
+exports.userSchema = userSchema;
