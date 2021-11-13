@@ -76,11 +76,12 @@ router.post('/login', async (req,res) => {
         return res.status(400).send('User not found')
     }
     // If theres a user AND the password passed in matches password in DB
-    if (user && bcrypt.compareSync(req.body.passwordHash, user.passwordHash)) {
+    if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
         // Generate JWT
         const token = jwt.sign(
             {
-                userId: user.id
+                userId: user.id,
+                isAdmin: user.isAdmin
             },
             // Password to create token (secret)
             secret,
