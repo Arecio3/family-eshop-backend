@@ -11,6 +11,8 @@ const usersRouter = require('./routers/users');
 const categoriesRouter = require('./routers/categories');
 const cors = require('cors');
 const authJwt = require('./helpers/jwt');
+const errorHandler = require('./helpers/error-handler');
+
 // Enviroment Variables
 const api = process.env.API_URL;
 const dbConnect = process.env.DB_URL;
@@ -32,6 +34,9 @@ app.use(morgan('tiny'))
 
 // Using JWT Authentication
 app.use(authJwt())
+
+//API Error handling  
+app.use(errorHandler())
 
 // Morgan writes a file for API logs
 app.use(morgan('combined', { stream: accessLogStream }))
