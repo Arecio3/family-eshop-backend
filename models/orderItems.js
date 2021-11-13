@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
-const Product = require('./product');
 
 const orderItemSchema = mongoose.Schema({
-    // product: Product,
-    quantity: Number
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+    },
+    quantity: {
+        type: Number,
+        required: true,
+    }
 })
 
 // Virtuals to change _id to id
