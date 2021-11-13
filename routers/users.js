@@ -95,4 +95,33 @@ router.post('/login', async (req,res) => {
     return res.status(200).send(user)
 })
 
+// Register New User Route
+router.post('/register', async (req, res) => {
+    const salt = await bcrypt.genSalt(10)
+    // create new user 
+    let user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        // Hashing password after user entered
+        passwordHash: bcrypt.hashSync(req.body.passwordHash, salt),
+        street: req.body.street,
+        apartment: req.body.apartment,
+        city: req.body.city,
+        state: req.body.state,
+        country: req.body.country,
+        zip: req.body.zip,
+        phone: req.body.phone,
+        isAdmin: req.body.isAdmin,
+    })
+    // waits async to save
+    user = await user.save();
+
+    // if theres no user
+    if (!user)
+    return res.status(404).send('User was not registered !');
+
+    // send to frontend
+    res.send(user);
+})
+
 module.exports = router;
