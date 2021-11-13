@@ -5,13 +5,36 @@ const bcrypt = require('bcrypt');
 
 // Get all Users
 router.get(`/`, async (req, res) => {
-    const userList = await User.find();
+    // The API excludes the password on JSON return
+    const userList = await User.find().select('-passwordHash');
 
     if (!userList) {
         res.status(500).json({success: false})
     }
     res.send(userList);
 })
+
+// Get users only with name, email, phone
+router.get(`/userinfo`, async (req, res) => {
+    // The API excludes the password on JSON return
+    const userList = await User.find().select('name email phone -_id');
+
+    if (!userList) {
+        res.status(500).json({success: false})
+    }
+    res.send(userList);
+})
+
+// Get One User
+router.get('/:id', async (req, res) => {
+    const user = await User.findById(req.params.id).select('-passwordHash');
+
+    if (!user) {
+        res.status(500).json({message: 'The Users ID is invalid'})
+    }
+    res.status(200).send(user)
+})
+
 
 // Register New User
 router.post('/', async (req, res) => {
