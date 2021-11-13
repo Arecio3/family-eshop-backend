@@ -1,6 +1,7 @@
 const { User } = require('../models/user');
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 // Get all Users
 router.get(`/`, async (req, res) => {
@@ -14,11 +15,13 @@ router.get(`/`, async (req, res) => {
 
 // Register New User
 router.post('/', async (req, res) => {
+    const salt = await bcrypt.genSalt(10)
     // create new user 
     let user = new User({
         name: req.body.name,
         email: req.body.email,
-        passwordHash: req.body.passwordHash,
+        // Hashing password after user entered
+        passwordHash: bcrypt.hashSync(req.body.passwordHash, salt),
         street: req.body.street,
         apartment: req.body.apartment,
         city: req.body.city,
