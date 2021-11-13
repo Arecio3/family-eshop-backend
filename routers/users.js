@@ -70,6 +70,7 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req,res) => {
     // checks email of user
     const user = await User.findOne({email: req.body.email})
+    const secret = process.env.secret
 
     if (!user) {
         return res.status(400).send('User not found')
@@ -82,7 +83,9 @@ router.post('/login', async (req,res) => {
                 userId: user.id
             },
             // Password to create token (secret)
-            'secret'
+            secret,
+            // token expires in 1 day
+            {expiresIn: '1d'}
         )
         res.status(200).send({user: user.email, token: token})
     } else {

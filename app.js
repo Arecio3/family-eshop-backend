@@ -10,6 +10,7 @@ const ordersRouter = require('./routers/orders');
 const usersRouter = require('./routers/users');
 const categoriesRouter = require('./routers/categories');
 const cors = require('cors');
+const authJwt = require('./helpers/jwt');
 // Enviroment Variables
 const api = process.env.API_URL;
 const dbConnect = process.env.DB_URL;
@@ -28,6 +29,9 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 
 // Using Morgan for logging API requests
 app.use(morgan('tiny'))
+
+// Using JWT Authentication
+app.use(authJwt())
 
 // Morgan writes a file for API logs
 app.use(morgan('combined', { stream: accessLogStream }))
