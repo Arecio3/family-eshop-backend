@@ -2,6 +2,7 @@ const { User } = require('../models/user');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Get all Users
 router.get(`/`, async (req, res) => {
@@ -63,6 +64,32 @@ router.post('/', async (req, res) => {
 
     // send to frontend
     res.send(user);
+})
+
+// Login
+router.post('/login', async (req,res) => {
+    // checks email of user
+    const user = await User.findOne({email: req.body.email})
+
+    if (!user) {
+        return res.status(400).send('User not found')
+    }
+    // If theres a user AND the password passed in matches password in DB
+    if (user && bcrypt.compareSync(req.body.passwordHash, user.passwordHash)) {
+        // Generate JWT
+        const token = jwt.sign(
+            {
+                userId: user.id
+            },
+            // Password to create token (secret)
+            'secret'
+        )
+        res.status(200).send({user: user.email, token: token})
+    } else {
+        res.status(400).send('Password is Incorrect!')
+    }
+
+    return res.status(200).send(user)
 })
 
 module.exports = router;
