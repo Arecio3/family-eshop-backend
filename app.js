@@ -34,6 +34,9 @@ app.use(morgan('tiny'))
 // Using JWT Authentication
 app.use(authJwt())
 
+// Makes public folder static
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'))
+
 //API Error handling  
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
