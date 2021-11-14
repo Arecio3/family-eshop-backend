@@ -63,6 +63,18 @@ router.post(`/`, async (req, res) => {
   // Unpacks promise being sent from orderItemIds
   const orderItemsIdsResolved = await orderItemsIds;
 
+    // Calculate Total Price of order
+    const totalPrices = await Promise.all(orderItemsIdsResolved.map(async (orderItemId) => {
+        // Maps over resolved Item IDs and grabs price
+        const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
+        // Multiplies Product price by quanity
+        const totalPrice = orderItem.product.price * orderItem.quantity;
+        return totalPrice
+    }))
+    // Adds all the individual product prices to one
+    const totalPrice = totalPrices.reduce((a,b) => a + b, 0);
+    console.log(totalPrices)
+
   // console.log(orderItemsIdsResolved);
 
   // Creating new order with request from body of DOM
@@ -75,7 +87,7 @@ router.post(`/`, async (req, res) => {
     country: req.body.country,
     phone: req.body.phone,
     status: req.body.status,
-    totalPrice: req.body.totalPrice,
+    totalPrice: totalPrice,
     user: req.body.user,
   });
   // Save to DB
@@ -85,5 +97,42 @@ router.post(`/`, async (req, res) => {
   // Send to frontend
   res.send(order);
 });
+
+// Update Order Status
+router.put('/:id', async (req, res) => {
+    const orderStatus = await Order.findByIdAndUpdate(
+        // grabs id from url
+        req.params.id,
+        // pass in values to update
+        {
+            status: req.body.status
+        },
+        // Sends back updated data instead of old data to console
+        { new: true }
+    )
+
+     // if theres no category
+     if (!orderStatus)
+     return res.status(404).send('Order status was not updated');
+ 
+     // send to frontend
+     res.send(orderStatus);
+})
+
+// Delete Order along with the products in the order
+router.delete('/:id', (req, res)=>{
+    Order.findByIdAndRemove(req.params.id).then(async order =>{
+        if(order) {
+            await order.orderItems.map(async orderItem => {
+                await OrderItem.findByIdAndRemove(orderItem)
+            })
+            return res.status(200).json({success: true, message: 'Order Destroyed!'})
+        } else {
+            return res.status(404).json({success: false , message: "Order not found!"})
+        }
+    }).catch(err=>{
+       return res.status(500).json({success: false, error: err}) 
+    })
+})
 
 module.exports = router;
