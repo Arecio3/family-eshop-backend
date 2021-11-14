@@ -75,6 +75,10 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
   const category = await Category.findById(req.body.category);
   if (!category) return res.status(400).send("Invalid Category");
 
+  // Check if we have file in request
+  const file = req.file;
+  if (!file) return res.status(400).send("You did not upload a file");
+
   // Multer IMG
   const fileName = req.file.filename
 
@@ -106,7 +110,7 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
 });
 
 // Update Product
-router.put("/:id", async (req, res) => {
+router.put("/:id", uploadOptions.single('image'), async (req, res) => {
   // Checks if the ID is wrong
   if (!mongoose.isValidObjectId(req.params.id)) {
     res.status(400).send("Invalid Product ID");
@@ -115,7 +119,23 @@ router.put("/:id", async (req, res) => {
   const category = await Category.findById(req.body.category);
   if (!category) return res.status(400).send("Invalid Category");
 
-  const product = await Product.findByIdAndUpdate(
+  // Find Product to check if exists
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(400).send("Invalid Product");
+
+  const file = req.file;
+  let imagePath;
+
+  if (file) {
+    const fileName = req.file.filename
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
+    imagePath = `${basePath}${fileName}`
+  } else {
+    // Uses old img from DB
+    imagePath = product.image;
+  }
+
+  const updatedProduct = await Product.findByIdAndUpdate(
     // grabs id from url
     req.params.id,
 
@@ -124,7 +144,7 @@ router.put("/:id", async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       richDescription: req.body.richDescription,
-      image: req.body.image,
+      image: imagePath,
       brand: req.body.brand,
       price: req.body.price,
       category: req.body.category,
@@ -139,10 +159,10 @@ router.put("/:id", async (req, res) => {
   );
 
   // if theres no category
-  if (!product) return res.status(404).send("Product was not updated");
+  if (!updatedProduct) return res.status(404).send("Product was not updated");
 
   // send to frontend
-  res.send(product);
+  res.send(updatedProduct);
 });
 
 // Delete Product
@@ -190,5 +210,36 @@ router.get(`/get/featured/:count`, async (req, res) => {
   }
   res.send(featProduct);
 });
+
+// Gallery
+router.put("/gallery-images/:id", uploadOptions.array('images', 15), async (req, res) => {
+    // Checks if the ID is wrong
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).send("Invalid Product ID");
+  }
+  const files = req.files;
+  let imagesPaths = [];
+  const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+  if (files) {
+    files.map(file => {
+        imagesPaths.push(`${basePath}${file.filename}`);
+    })
+  }
+
+
+  const gallery = await Product.findByIdAndUpdate(
+    req.params.id,
+    {
+      images: imagesPaths
+    },
+    // Sends back updated data instead of old data to console
+    { new: true }
+  );
+  // if theres no category
+  if (!gallery) return res.status(404).send("Gallery was not updated");
+
+  // send to frontend
+  res.send(gallery);
+})
 
 module.exports = router;
