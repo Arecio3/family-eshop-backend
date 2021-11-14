@@ -60,6 +60,7 @@ router.post(`/`, async (req, res) => {
       return newOrderItem._id;
     })
   );
+
   // Unpacks promise being sent from orderItemIds
   const orderItemsIdsResolved = await orderItemsIds;
 
@@ -148,5 +149,21 @@ router.get('/get/revenue', async (req,res) => {
 
     res.send({totalSales: totalSales.pop().totalsales})
 })
+
+// Get User Order History
+router.get(`/get/userorders/:userid`, async (req, res) => {
+    // grabs userid from url as a condition to find
+    const userOrderList = await Order.find({user: req.params.userid})
+    // Populate Product Info
+    .populate({
+        path: "orderItems",
+        populate: { path: "product", populate: "category" },
+      }).sort({ dateOrdered: -1 });
+  
+    if (!userOrderList) {
+      res.status(500).json({ success: false });
+    }
+    res.send(userOrderList);
+  });
 
 module.exports = router;
